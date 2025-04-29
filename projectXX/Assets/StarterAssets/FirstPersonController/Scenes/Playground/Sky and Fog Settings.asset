@@ -198,7 +198,7 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 2
   enabled:
-    m_OverrideState: 1
+    m_OverrideState: 0
     m_Value: 1
   colorMode:
     m_OverrideState: 1
@@ -229,7 +229,7 @@ MonoBehaviour:
     m_Value: 184
   meanFreePath:
     m_OverrideState: 1
-    m_Value: 196.4
+    m_Value: 42.48
   enableVolumetricFog:
     m_OverrideState: 1
     m_Value: 1
