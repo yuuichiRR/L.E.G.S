@@ -105,7 +105,7 @@ NavMeshSettings:
   m_BuildSettings:
     serializedVersion: 3
     agentTypeID: 0
-    agentRadius: 0.12
+    agentRadius: 0.1
     agentHeight: 2
     agentSlope: 60
     agentClimb: 0.4
@@ -113,7 +113,7 @@ NavMeshSettings:
     maxJumpAcrossDistance: 0
     minRegionArea: 2
     manualCellSize: 0
-    cellSize: 0.04
+    cellSize: 0.033333335
     manualTileSize: 0
     tileSize: 256
     buildHeightMesh: 0
@@ -5980,7 +5980,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 515504114}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 1384774831, guid: e743331561ef77147ae48cda9bcb8209, type: 3}
   m_Name: 
@@ -9345,7 +9345,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3faf9ce6df616034b893aa117038d6ef, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.681
+      value: 3.063
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3faf9ce6df616034b893aa117038d6ef, type: 3}
       propertyPath: m_LocalPosition.y
@@ -9393,7 +9393,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3faf9ce6df616034b893aa117038d6ef, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3faf9ce6df616034b893aa117038d6ef, type: 3}
       propertyPath: m_TagString
@@ -9403,6 +9403,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: f4108cdf4ab1e1846a7061851ed1b361, type: 2}
+    - target: {fileID: 8879528566716807029, guid: 3faf9ce6df616034b893aa117038d6ef, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.98
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -15326,11 +15330,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 2120179536}
-  visionRange: 28.8
-  visionAngle: 305.1
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 0
+  agent: {fileID: 0}
+  playerFlashlight: {fileID: 0}
+  normalSpeed: 0
+  retreatSpeed: 8
+  flashReactionDistance: 15
+  retreatDuration: 1.5
 --- !u!95 &1129826576
 Animator:
   serializedVersion: 5
@@ -24056,10 +24061,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 4.08
-  m_Height: 16.68
+  m_Radius: 2.72
+  m_Height: 13.2
   m_Direction: 1
-  m_Center: {x: -2.25, y: 7.59, z: 0}
+  m_Center: {x: -2.25, y: 6.4, z: 0}
 --- !u!195 &1343875451
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -24069,7 +24074,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1343875448}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 1.17
+  m_Radius: 4.69
   m_Speed: 2
   m_Acceleration: 15
   avoidancePriority: 50
@@ -24078,9 +24083,9 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 5.47
-  m_BaseOffset: -0.2
-  m_WalkableMask: 4294967295
+  m_Height: 8.55
+  m_BaseOffset: -0.09
+  m_WalkableMask: 3
   m_ObstacleAvoidanceType: 4
 --- !u!95 &1343875452
 Animator:
@@ -24116,11 +24121,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 2120179536}
-  visionRange: 41
-  visionAngle: 305.1
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 0
+  agent: {fileID: 1343875451}
+  playerFlashlight: {fileID: 1944493636}
+  normalSpeed: 3
+  retreatSpeed: 150
+  flashReactionDistance: 25
+  retreatDuration: 1.5
 --- !u!114 &1343875455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34622,8 +34628,9 @@ GameObject:
   - component: {fileID: 1944493634}
   - component: {fileID: 1944493633}
   - component: {fileID: 1944493635}
+  - component: {fileID: 1944493636}
   m_Layer: 0
-  m_Name: Spot Light
+  m_Name: Flashlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34779,7 +34786,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0
-  m_Range: 26.34
+  m_Range: 25
   m_SpotAngle: 56.9
   m_InnerSpotAngle: 10.4
   m_CookieSize: 10
@@ -34972,6 +34979,25 @@ MonoBehaviour:
     handleAnimatorIK: 0
   fsmTemplate: {fileID: 0}
   eventHandlerComponentsAdded: 0
+--- !u!114 &1944493636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944493631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3ac08d38ced98f4b8d50ede5ab15a3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashLight: {fileID: 1944493634}
+  flashDuration: 0.2
+  flashIntensity: 100
+  flashAngle: 45
+  flashRange: 25
+  flashKey: 102
+  cooldownTime: 10
 --- !u!4 &1950259286 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 13edc8a8ebe49f046a14ac8b40bf8984, type: 3}

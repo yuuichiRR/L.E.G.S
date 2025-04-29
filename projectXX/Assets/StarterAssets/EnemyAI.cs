@@ -3,78 +3,76 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    public Transform player; // Ссылка на игрока
-    public float visionRange = 10f; // Дальность видимости
-    public float visionAngle = 90f; // Угол обзора (в градусах)
-    public LayerMask obstacleMask; // Слой препятствий
-
-    private NavMeshAgent agent;
-    private Vector3 lastKnownPosition;
-    private bool playerVisible = false;
+    public Transform player;
+    public NavMeshAgent agent;
+    public Flashlight playerFlashlight;
+    
+    [Header("Movement Settings")]
+    public float normalSpeed = 3.5f;
+    public float retreatSpeed = 8f;
+    
+    [Header("Flash Reaction")]
+    public float flashReactionDistance = 10f;
+    public float retreatDuration = 2f;
+    
+    private bool isRetreating = false;
+    private Vector3 retreatDirection;
 
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
+        if (agent == null) agent = GetComponent<NavMeshAgent>();
+        agent.speed = normalSpeed;
     }
 
     void Update()
     {
-        // Проверяем видимость игрока
-        playerVisible = IsPlayerVisible();
-
-        if (playerVisible)
+        if (isRetreating) return;
+        
+        // Простое преследование игрока
+        if (player != null)
         {
-            // Если игрок виден - запоминаем его позицию и двигаемся к нему
-            lastKnownPosition = player.position;
-            agent.SetDestination(lastKnownPosition);
-            agent.isStopped = false;
+            agent.SetDestination(player.position);
         }
-        else
+        
+        // Реакция на фонарик
+        if (CheckFlashlightHit())
         {
-            // Если игрок не виден - останавливаемся
-            agent.isStopped = true;
+            StartCoroutine(Retreat());
         }
     }
 
-    bool IsPlayerVisible()
+    bool CheckFlashlightHit()
     {
-        // Проверяем расстояние до игрока
-        if (Vector3.Distance(transform.position, player.position) > visionRange)
-        {
+        if (playerFlashlight == null || !playerFlashlight.IsFlashing()) 
             return false;
-        }
-
-        // Проверяем угол между направлением врага и направлением к игроку
-        Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        float angleToPlayer = Vector3.Angle(transform.forward, directionToPlayer);
-
-        if (angleToPlayer > visionAngle / 2f)
-        {
-            return false;
-        }
-
-        // Проверяем, нет ли препятствий между врагом и игроком
-        if (Physics.Raycast(transform.position, directionToPlayer, out RaycastHit hit, visionRange, obstacleMask))
-        {
-            if (hit.transform != player)
-            {
-                return false;
-            }
-        }
-
-        return true;
+            
+        float distance = Vector3.Distance(transform.position, player.position);
+        return distance <= flashReactionDistance;
     }
 
-    // Визуализация зоны видимости в редакторе
-    void OnDrawGizmosSelected()
+    System.Collections.IEnumerator Retreat()
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, visionRange);
+        isRetreating = true;
+        agent.speed = retreatSpeed;
+        
+        // Отбегаем в противоположном направлении
+        retreatDirection = (transform.position - player.position).normalized;
+        Vector3 retreatTarget = transform.position + retreatDirection * 5f;
+        
+        agent.SetDestination(retreatTarget);
+        
+        yield return new WaitForSeconds(retreatDuration);
+        
+        agent.speed = normalSpeed;
+        isRetreating = false;
+    }
 
-        Vector3 leftBound = Quaternion.Euler(0, -visionAngle / 2, 0) * transform.forward * visionRange;
-        Vector3 rightBound = Quaternion.Euler(0, visionAngle / 2, 0) * transform.forward * visionRange;
-
-        Gizmos.DrawLine(transform.position, transform.position + leftBound);
-        Gizmos.DrawLine(transform.position, transform.position + rightBound);
+    void OnDrawGizmos()
+    {
+        if (isRetreating)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, transform.position + retreatDirection * 3f);
+        }
     }
 }
