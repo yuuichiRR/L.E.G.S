@@ -7,21 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: glass
-    second: {fileID: 2100000, guid: ca700efd451673c4ca69734655f6b68f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: lamp
-    second: {fileID: 2100000, guid: 1eeaef116d00e5f4e8587af2cf1d7a85, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: toilet
-    second: {fileID: 2100000, guid: 1eeaef116d00e5f4e8587af2cf1d7a85, type: 2}
+      name: No Name
+    second: {fileID: 2100000, guid: d076ffb3bbf2f334896ca295338dce6a, type: 2}
   materials:
     materialImportMode: 1
-    materialName: 1
+    materialName: 0
     materialSearch: 1
     materialLocation: 1
   animations:
