@@ -14,9 +14,10 @@ public class EnemyAI : MonoBehaviour
     [Header("Flash Reaction")]
     public float flashReactionDistance = 10f;
     public float retreatDuration = 2f;
+    public float minRetreatDistance = 5f; // Минимальная дистанция для отбегания
     
     private bool isRetreating = false;
-    private Vector3 retreatDirection;
+    private Vector3 retreatTarget;
 
     void Start()
     {
@@ -26,13 +27,13 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
+        if (player == null) return;
+        
+        // Если моб в режиме отступления - ничего не делаем
         if (isRetreating) return;
         
-        // Простое преследование игрока
-        if (player != null)
-        {
-            agent.SetDestination(player.position);
-        }
+        // Обычное преследование игрока
+        agent.SetDestination(player.position);
         
         // Реакция на фонарик
         if (CheckFlashlightHit())
@@ -55,13 +56,24 @@ public class EnemyAI : MonoBehaviour
         isRetreating = true;
         agent.speed = retreatSpeed;
         
-        // Отбегаем в противоположном направлении
-        retreatDirection = (transform.position - player.position).normalized;
-        Vector3 retreatTarget = transform.position + retreatDirection * 5f;
+        // Вычисляем точку отступления
+        Vector3 directionFromPlayer = (transform.position - player.position).normalized;
+        retreatTarget = transform.position + directionFromPlayer * minRetreatDistance;
         
-        agent.SetDestination(retreatTarget);
+        // Находим ближайшую точку на NavMesh
+        if (NavMesh.SamplePosition(retreatTarget, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        {
+            retreatTarget = hit.position;
+            agent.SetDestination(retreatTarget);
+        }
         
-        yield return new WaitForSeconds(retreatDuration);
+        // Ждём, пока моб не убежит достаточно далеко или не истечёт время
+        float startTime = Time.time;
+        while (Time.time - startTime < retreatDuration && 
+               Vector3.Distance(transform.position, player.position) < flashReactionDistance * 1.5f)
+        {
+            yield return null;
+        }
         
         agent.speed = normalSpeed;
         isRetreating = false;
@@ -72,7 +84,8 @@ public class EnemyAI : MonoBehaviour
         if (isRetreating)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, transform.position + retreatDirection * 3f);
+            Gizmos.DrawSphere(retreatTarget, 0.5f);
+            Gizmos.DrawLine(transform.position, retreatTarget);
         }
     }
 }
